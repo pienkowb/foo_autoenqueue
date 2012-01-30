@@ -5,9 +5,9 @@
 #include "../helpers/helpers.h"
 
 #include <string>
-#include <queue>
+#include <deque>
 
-extern std::queue< std::pair<UINT, std::wstring> > files;
+extern std::deque< std::pair<UINT, std::wstring> > files;
 DWORD WINAPI EnqueueingProc(LPVOID);
 
 #endif // ENQUEUEING_H

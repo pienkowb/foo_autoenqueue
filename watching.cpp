@@ -81,7 +81,7 @@ DWORD WINAPI WatchingProc(LPVOID lpParameter) {
 				wstring f(info->FileName, info->FileNameLength / sizeof(WCHAR));				
 
 				WaitForSingleObject(mutex, INFINITE);				
-				files.push(make_pair(i, f));				
+				files.push_back(make_pair(i, f));				
 				ReleaseMutex(mutex);
 			}
             offset += info->NextEntryOffset;

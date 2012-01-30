@@ -5,15 +5,17 @@
 #include "../SDK/foobar2000.h"
 #include "../helpers/helpers.h"
 
+#include <algorithm>
+
 #include <vector>
-#include <queue>
+#include <deque>
 #include <string>
 
 using namespace std;
 
 //------------------------------------------------------------------------------
 
-queue< pair<UINT, wstring> > files;
+deque< pair<UINT, wstring> > files;
 static const int waitTime = 10;
 
 //------------------------------------------------------------------------------
@@ -89,44 +91,47 @@ DWORD WINAPI EnqueueingProc(LPVOID) {
 			using namespace pfc::stringcvt;
 			path.add_string(string_utf8_from_wide(item.second.c_str()));
 
+			filesystem::g_get_canonical_path(path, path);
+
 			try {
 				abort_callback_impl abort;
 
-				if(filesystem::g_exists(path, abort)) {
-					filesystem::g_get_canonical_path(path, path);
+				if(!filesystem::g_exists(path, abort))
+					throw exception_io_not_found();
+
+				if(!input_entry::g_is_supported_path(path))
+					throw exception_aborted();
+
+				if(!wildcard_helper::test_path(path, cfg_restrict, true))
+					throw exception_aborted();
+				if(wildcard_helper::test_path(path, cfg_exclude, true))
+					throw exception_aborted();
+
+				service_ptr_t<input_info_reader> iir;
+				input_entry::g_open_for_info_read(iir, 0, path, abort);
+
+				if(iir->get_file_stats(abort).m_size == 0)
+					throw exception_io_data();
+
+				pfc::list_t<metadb_handle_ptr> items;
 				
-					if(!input_entry::g_is_supported_path(path))
-						throw exception_aborted();
-
-					if(!wildcard_helper::test_path(path, cfg_restrict, true))
-						throw exception_aborted();
-					if(wildcard_helper::test_path(path, cfg_exclude, true))
-						throw exception_aborted();
-
-					service_ptr_t<input_info_reader> iir;
-					input_entry::g_open_for_info_read(iir, 0, path, abort);
-
-					if(iir->get_file_stats(abort).m_size == 0)
-						throw exception_io_data();
-
-					pfc::list_t<metadb_handle_ptr> items;
+				const t_uint32 count = iir->get_subsong_count();
+				for(t_uint32 i = 0; i < count; i++) {
+					abort.check();
 					
-					const t_uint32 count = iir->get_subsong_count();
-					for(t_uint32 i = 0; i < count; i++) {
-						abort.check();
-						
-						static_api_ptr_t<metadb> m;
-						metadb_handle_ptr handle;
-						m->handle_create(handle, make_playable_location(path, 
-							iir->get_subsong(i)));
+					static_api_ptr_t<metadb> m;
+					metadb_handle_ptr handle;
+					m->handle_create(handle, make_playable_location(path, 
+						iir->get_subsong(i)));
 
-						items.add_item(handle);
-					}
-
-					static_api_ptr_t<main_thread_callback_manager> mtcm;
-					mtcm->add_callback(new service_impl_t<enqueuer>(items, 
-						item.first));
+					items.add_item(handle);
 				}
+
+				static_api_ptr_t<main_thread_callback_manager> mtcm;
+				mtcm->add_callback(new service_impl_t<enqueuer>(items,
+					item.first));
+			} catch(exception_io_not_found&) {
+				waiting.push_back(item);
 			} catch(exception_io_data&) {
 				waiting.push_back(item);
 			} catch(exception_io_sharing_violation&) {
@@ -140,12 +145,13 @@ DWORD WINAPI EnqueueingProc(LPVOID) {
 				console::formatter() << e.what() << ": \"" << dpath << "\"";
 			}
 
-			files.pop();
+			files.pop_front();
 		}
-		
+
 		vector< pair<UINT, wstring> >::iterator it = waiting.begin();
 		for(; it != waiting.end(); it++)
-			files.push(*it);
+			if(find(files.begin(), files.end(), *it) == files.end())
+				files.push_back(*it);
 
 		ReleaseMutex(mutex);
 		Sleep(waitTime);
