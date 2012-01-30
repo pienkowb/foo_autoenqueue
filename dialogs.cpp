@@ -313,7 +313,10 @@ INT_PTR CALLBACK addEditProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 		}
 
 		case WM_COMMAND:
-			if(HIWORD(wp) == BN_CLICKED) {
+			if(LOWORD(wp) == IDCANCEL) {
+				EndDialog(hwnd, NULL);
+			}
+			else if(HIWORD(wp) == BN_CLICKED) {
 				WORD id = LOWORD(wp);
 				
 				if(id == IDC_OPEN)
