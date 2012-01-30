@@ -57,11 +57,18 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 		case WM_NOTIFY: {
 			NMHDR& nm = *reinterpret_cast<NMHDR*>(lp);
-			if(nm.idFrom == IDC_OBSERVEDLIST && nm.code == LVN_ITEMCHANGED) {
-				BOOL state = ListView_GetSingleSelection(nm.hwndFrom) != -1;
 
+			if(nm.idFrom != IDC_OBSERVEDLIST) break;
+
+			BOOL state = (ListView_GetSingleSelection(nm.hwndFrom) != -1);
+
+			if(nm.code == LVN_ITEMCHANGED) {
 				EnableWindow(GetDlgItem(hwnd, IDC_EDIT), state);
 				EnableWindow(GetDlgItem(hwnd, IDC_REMOVE), state);
+			}
+			else if(nm.code == NM_DBLCLK) {
+				WORD id = state ? IDC_EDIT : IDC_ADDNEW;
+				SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(id, BN_CLICKED), 0);
 			}
 			break;
 		}
