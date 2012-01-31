@@ -6,6 +6,8 @@
 #include "../SDK/foobar2000.h"
 #include "../helpers/helpers.h"
 
+#include <uxtheme.h>
+
 //------------------------------------------------------------------------------
 
 void loadObservedList(HWND listview) {
@@ -35,14 +37,16 @@ void loadObservedList(HWND listview) {
 INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 	switch(msg) {
 		case WM_INITDIALOG: {
-			HWND listview = GetDlgItem(hwnd, IDC_OBSERVEDLIST);			
+			HWND listview = GetDlgItem(hwnd, IDC_OBSERVEDLIST);
 
-			ListView_SetExtendedListViewStyle(listview, LVS_EX_FULLROWSELECT 
-				| LVS_EX_GRIDLINES);
-			
+			SetWindowTheme(listview, L"Explorer", NULL);
+
+			ListView_SetExtendedListViewStyle(listview, LVS_EX_FULLROWSELECT
+				| LVS_EX_DOUBLEBUFFER);
+
 			listview_helper::insert_column(listview, 0, "Folder", 175);
 			listview_helper::insert_column(listview, 1, "Playlist", 80);
-			
+
 			loadObservedList(listview);
 
 			HWND trackbar = GetDlgItem(hwnd, IDC_BUFFSIZE);

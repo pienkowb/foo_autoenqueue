@@ -57,7 +57,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shared.lib"
+				AdditionalDependencies="shared.lib shlwapi.lib uxtheme.lib"
 				AdditionalLibraryDirectories="../shared"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
@@ -128,7 +128,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shared.lib shlwapi.lib"
+				AdditionalDependencies="shared.lib shlwapi.lib uxtheme.lib"
 				AdditionalLibraryDirectories="..\shared"
 				IgnoreDefaultLibraryNames="libcmt"
 				GenerateDebugInformation="true"
