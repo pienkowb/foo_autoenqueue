@@ -28,7 +28,7 @@ public:
 	enqueuer(pfc::list_t<metadb_handle_ptr> it, UINT i) : items(it), index(i) {}
 	t_size getPlaylist(pfc::string8 name) {
 		if(name.is_empty()) 
-			return infinite;
+			return pfc_infinite;
 
 		if(name[0] == '0') {
 			name.remove_chars(0, 1);
@@ -39,7 +39,7 @@ public:
 		else if(name[0] == '2')
 			return pm->get_playing_playlist();
 		else 
-			return infinite;
+			return pfc_infinite;
 	}
 	void callback_run() {
 		if(!items.get_count()) return;
@@ -60,7 +60,7 @@ public:
 			metadb_io_v2::op_flag_no_errors, NULL);
 
 		t_size playlist = getPlaylist(watched[index].playlist);
-		if(playlist == infinite) return;
+		if(playlist == pfc_infinite) return;
 		
 		pm->set_active_playlist(playlist);
 		pm->playlist_add_items(playlist, items, bit_array_true());

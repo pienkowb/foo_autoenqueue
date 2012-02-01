@@ -7,6 +7,7 @@
 #include "../helpers/helpers.h"
 
 #include <list>
+#include <iterator>
 
 using namespace std;
 using namespace stdext;
