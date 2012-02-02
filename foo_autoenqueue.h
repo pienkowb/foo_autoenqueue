@@ -5,9 +5,9 @@
 #include "../helpers/helpers.h"
 
 extern cfg_watchedlist cfg_watched;
-extern cfg_uint cfg_buffsize;
 extern cfg_string cfg_restrict;
 extern cfg_string cfg_exclude;
+extern advconfig_integer_factory cfg_buffsize;
 
 extern BOOL watching;
 extern HANDLE mutex;

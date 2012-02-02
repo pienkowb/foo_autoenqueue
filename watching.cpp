@@ -29,7 +29,7 @@ static void errorMessage(DWORD code, const char* prefix = "") {
 //------------------------------------------------------------------------------
 
 DWORD WINAPI WatchingProc(LPVOID lpParameter) {
-	UINT i = UINT(lpParameter), bufferSize = cfg_buffsize*1024;
+	UINT i = UINT(lpParameter), bufferSize = UINT(cfg_buffsize)*1024;
 
 	HANDLE directory = uCreateFile(watched[i].directory, FILE_LIST_DIRECTORY, 
 		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, 

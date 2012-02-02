@@ -3,8 +3,6 @@
 #define IDC_ADDNEW              1003
 #define IDC_EDIT                1004
 #define IDC_REMOVE              1005
-#define IDC_BUFFSIZE            1007
-#define IDC_SIZELABEL           1008
 #define IDC_RESTRICT            1011
 #define IDC_EXCLUDE             1012
 #define IDD_ADDEDIT             1100

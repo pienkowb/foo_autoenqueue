@@ -49,11 +49,6 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 			loadObservedList(listview);
 
-			HWND trackbar = GetDlgItem(hwnd, IDC_BUFFSIZE);
-			SendMessage(trackbar, TBM_SETRANGE, FALSE, MAKELONG(1, 64));
-			SendMessage(trackbar, TBM_SETPOS, TRUE, cfg_buffsize);
-			SendMessage(hwnd, WM_HSCROLL, 0, LPARAM(trackbar));
-
 			uSetDlgItemText(hwnd, IDC_RESTRICT, cfg_restrict);
 			uSetDlgItemText(hwnd, IDC_EXCLUDE, cfg_exclude);
 			break;
@@ -114,20 +109,7 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 			break;
 		}
 
-		case WM_HSCROLL: {
-			if(HWND(lp) != GetDlgItem(hwnd, IDC_BUFFSIZE)) break;
-
-			pfc::string8 label;
-			label << SendMessage(HWND(lp), TBM_GETPOS, 0, 0) << " kB";
-
-			uSetDlgItemText(hwnd, IDC_SIZELABEL, label);
-			break;
-		}
-
 		case WM_DESTROY: {
-			HWND handle = GetDlgItem(hwnd, IDC_BUFFSIZE);
-			cfg_buffsize = SendMessage(handle, TBM_GETPOS, 0, 0);
-			
 			uGetWindowText(GetDlgItem(hwnd, IDC_RESTRICT), cfg_restrict);
 			uGetWindowText(GetDlgItem(hwnd, IDC_EXCLUDE), cfg_exclude);
 
