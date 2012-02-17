@@ -10,6 +10,29 @@
 
 //------------------------------------------------------------------------------
 
+HFONT createSeparatorFont(HWND hwnd) {
+	HFONT font = (HFONT) SendMessage(hwnd, WM_GETFONT, 0, 0);
+
+	LOGFONT lf;
+	GetObject(font, sizeof(LOGFONT), &lf);
+
+	lf.lfHeight = -14;
+	lf.lfWeight = FW_BOLD;
+
+	return CreateFontIndirect(&lf);
+}
+
+void createSeparator(HWND parent, const char* name, int y) {
+	static HFONT font = createSeparatorFont(parent);
+
+	HWND hwnd = uCreateWindowEx(0x00000004, "foobar2000:separator", name,
+		0x50010000, 0, y, 498, 20, parent, NULL, NULL, NULL);
+	
+	SendMessage(hwnd, WM_SETFONT, (WPARAM) font, 0);
+}
+
+//------------------------------------------------------------------------------
+
 void loadObservedList(HWND listview) {
 	ListView_DeleteAllItems(listview);
 
@@ -44,10 +67,13 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 			ListView_SetExtendedListViewStyle(listview, LVS_EX_FULLROWSELECT
 				| LVS_EX_DOUBLEBUFFER);
 
-			listview_helper::insert_column(listview, 0, "Folder", 175);
+			listview_helper::insert_column(listview, 0, "Folder", 178);
 			listview_helper::insert_column(listview, 1, "Playlist", 80);
 
 			loadObservedList(listview);
+
+			createSeparator(hwnd, "Observed folders", 0);
+			createSeparator(hwnd, "File types", 192);
 
 			uSetDlgItemText(hwnd, IDC_RESTRICT, cfg_restrict);
 			uSetDlgItemText(hwnd, IDC_EXCLUDE, cfg_exclude);
