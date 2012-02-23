@@ -107,16 +107,18 @@ public:
 
 	HWND get_wnd() { return hwnd; }
 
-	t_uint32 get_state() {
+	t_uint32 get_state() {		
+		t_uint32 state = preferences_state::resettable;
+
 		pfc::string8 restrict, exclude;
 
 		uGetWindowText(GetDlgItem(hwnd, IDC_RESTRICT), restrict);
 		uGetWindowText(GetDlgItem(hwnd, IDC_EXCLUDE), exclude);
 
 		if(restrict != cfg_restrict || exclude != cfg_exclude)
-			return preferences_state::resettable | preferences_state::changed;
-		else
-			return preferences_state::resettable;
+			state |= preferences_state::changed;
+
+		return state;
 	}
 
 	void apply() {
