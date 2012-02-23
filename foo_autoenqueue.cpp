@@ -90,29 +90,63 @@ public:
 
 static initquit_factory_t<initquit_autoenqueue> foo_initquit;
 
-void onDestroy() {
+void restartThreads() {
 	foo_initquit.get_static_instance().on_quit();
 	foo_initquit.get_static_instance().on_init();
 }
 
 //------------------------------------------------------------------------------
 
-class preferences_page_autoenqueue : public preferences_page {
-	HWND create(HWND p_parent) {
-		return uCreateDialog(IDD_PREFPAGE, p_parent, prefPageProc);
+class PreferencesPage : public preferences_page_instance {
+	HWND hwnd;
+public:
+	PreferencesPage(HWND parent, preferences_page_callback::ptr callback) {
+		hwnd = uCreateDialog(IDD_PREFPAGE, parent, prefPageProc,
+			LPARAM(callback.get_ptr()));
 	}
-	const char* get_name() { return "Autoenqueuer"; }
+
+	HWND get_wnd() { return hwnd; }
+
+	t_uint32 get_state() {
+		pfc::string8 restrict, exclude;
+
+		uGetWindowText(GetDlgItem(hwnd, IDC_RESTRICT), restrict);
+		uGetWindowText(GetDlgItem(hwnd, IDC_EXCLUDE), exclude);
+
+		if(restrict != cfg_restrict || exclude != cfg_exclude)
+			return preferences_state::resettable | preferences_state::changed;
+		else
+			return preferences_state::resettable;
+	}
+
+	void apply() {
+		uGetWindowText(GetDlgItem(hwnd, IDC_RESTRICT), cfg_restrict);
+		uGetWindowText(GetDlgItem(hwnd, IDC_EXCLUDE), cfg_exclude);
+
+		restartThreads();
+	}
+
+	void reset() {
+		uSetDlgItemText(hwnd, IDC_RESTRICT, "*");
+		uSetDlgItemText(hwnd, IDC_EXCLUDE, "*.CUE");
+	}
+};
+
+class preferences_page_autoenqueue : public preferences_page_v3 {
+	preferences_page_instance::ptr instantiate(HWND parent,
+		preferences_page_callback::ptr callback)
+	{
+		return new service_impl_t<PreferencesPage>(parent, callback);
+	}
+
+	const char* get_name() { return "Autoenqueuer";	}
+
+	GUID get_parent_guid() { return guid_tools; }
+
 	GUID get_guid() {
 		static const GUID guid = { 0x760866b8, 0x971, 0x4aed, { 0xb8, 0x5e,
 			0x41, 0xa5, 0xda, 0xba, 0xc3, 0x75 } };
 		return guid;
-	}
-	GUID get_parent_guid() { return guid_tools; }
-	bool reset_query() { return true; }
-	void reset() {
-		cfg_watched.remove_all();
-		cfg_restrict = "*";
-		cfg_exclude = "*.CUE";
 	}
 };
 

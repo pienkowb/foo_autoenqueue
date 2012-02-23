@@ -58,8 +58,12 @@ void loadObservedList(HWND listview) {
 //------------------------------------------------------------------------------
 
 INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
+	static preferences_page_callback::ptr callback;
+
 	switch(msg) {
 		case WM_INITDIALOG: {
+			callback = (preferences_page_callback*) lp;
+
 			HWND listview = GetDlgItem(hwnd, IDC_OBSERVEDLIST);
 
 			SetWindowTheme(listview, L"Explorer", NULL);
@@ -132,14 +136,10 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 				EnableWindow(GetDlgItem(hwnd, IDC_EDIT), FALSE);
 				EnableWindow(GetDlgItem(hwnd, IDC_REMOVE), FALSE);
 			}
-			break;
-		}
-
-		case WM_DESTROY: {
-			uGetWindowText(GetDlgItem(hwnd, IDC_RESTRICT), cfg_restrict);
-			uGetWindowText(GetDlgItem(hwnd, IDC_EXCLUDE), cfg_exclude);
-
-			onDestroy();
+			else if(HIWORD(wp) == EN_CHANGE) {
+				if(callback.is_valid())
+					callback->on_state_changed();
+			}
 			break;
 		}
 

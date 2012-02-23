@@ -12,6 +12,4 @@ extern advconfig_integer_factory cfg_buffsize;
 extern BOOL watching;
 extern HANDLE mutex;
 
-void onDestroy();
-
 #endif // FOO_AUTOENQUEUE_H
