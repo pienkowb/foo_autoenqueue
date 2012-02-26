@@ -20,12 +20,12 @@ static const int waitTime = 10;
 
 //------------------------------------------------------------------------------
 
-class enqueuer : public main_thread_callback {
+class Enqueuer : public main_thread_callback {
 	static_api_ptr_t<playlist_manager> pm;
 	pfc::list_t<metadb_handle_ptr> items;
 	t_uint32 index;
 public:
-	enqueuer(pfc::list_t<metadb_handle_ptr> it, UINT i) : items(it), index(i) {}
+	Enqueuer(pfc::list_t<metadb_handle_ptr> it, UINT i) : items(it), index(i) {}
 	t_size getPlaylist(pfc::string8 name) {
 		if(name.is_empty()) 
 			return pfc_infinite;
@@ -128,7 +128,7 @@ DWORD WINAPI EnqueueingProc(LPVOID) {
 				}
 
 				static_api_ptr_t<main_thread_callback_manager> mtcm;
-				mtcm->add_callback(new service_impl_t<enqueuer>(items,
+				mtcm->add_callback(new service_impl_t<Enqueuer>(items,
 					item.first));
 			} catch(exception_io_not_found&) {
 				waiting.push_back(item);
