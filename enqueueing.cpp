@@ -1,15 +1,16 @@
 #include "enqueueing.h"
-#include "watching.h"
+
 #include "foo_autoenqueue.h"
+#include "preferences.h"
+#include "watching.h"
 
 #include "../SDK/foobar2000.h"
 #include "../helpers/helpers.h"
 
 #include <algorithm>
-
-#include <vector>
 #include <deque>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -26,6 +27,7 @@ class Enqueuer : public main_thread_callback {
 	t_uint32 index;
 public:
 	Enqueuer(pfc::list_t<metadb_handle_ptr> it, UINT i) : items(it), index(i) {}
+
 	t_size getPlaylist(pfc::string8 name) {
 		if(name.is_empty()) 
 			return pfc_infinite;
@@ -41,6 +43,7 @@ public:
 		else 
 			return pfc_infinite;
 	}
+
 	void callback_run() {
 		if(!items.get_count()) return;
 

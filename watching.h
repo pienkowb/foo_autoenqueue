@@ -14,6 +14,18 @@ struct Watched {
 	bool watchSubtree;
 	bool requireConfirm;
 	bool autoPlay;
+
+	bool operator==(const Watched& other) const {
+		return (directory == other.directory
+			&& playlist == other.playlist
+			&& watchSubtree == other.watchSubtree
+			&& requireConfirm == other.requireConfirm
+			&& autoPlay == other.autoPlay);
+	}
+
+	bool operator!=(const Watched& other) const {
+		return !(*this == other);
+	}
 };
 
 //------------------------------------------------------------------------------

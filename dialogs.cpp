@@ -1,7 +1,8 @@
 #include "dialogs.h"
-#include "watching.h"
+
+#include "preferences.h"
 #include "resources.h"
-#include "foo_autoenqueue.h"
+#include "watching.h"
 
 #include "../SDK/foobar2000.h"
 #include "../helpers/helpers.h"
@@ -36,8 +37,8 @@ void createSeparator(HWND parent, const char* name, int y) {
 void loadObservedList(HWND listview) {
 	ListView_DeleteAllItems(listview);
 
-	for(unsigned int i = 0; i < cfg_watched.get_count(); i++) {
-		const Watched& w = cfg_watched[i];
+	for(unsigned int i = 0; i < tmp_watched.get_count(); i++) {
+		const Watched& w = tmp_watched[i];
 		listview_helper::insert_item(listview, i, w.directory, NULL);
 
 		if(w.playlist.is_empty()) continue;
@@ -64,6 +65,9 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 		case WM_INITDIALOG: {
 			callback = (preferences_page_callback*) lp;
 
+			createSeparator(hwnd, "Observed folders", 0);
+			createSeparator(hwnd, "File types", 192);
+
 			HWND listview = GetDlgItem(hwnd, IDC_OBSERVEDLIST);
 
 			SetWindowTheme(listview, L"Explorer", NULL);
@@ -75,9 +79,6 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 			listview_helper::insert_column(listview, 1, "Playlist", 80);
 
 			loadObservedList(listview);
-
-			createSeparator(hwnd, "Observed folders", 0);
-			createSeparator(hwnd, "File types", 192);
 
 			uSetDlgItemText(hwnd, IDC_RESTRICT, cfg_restrict);
 			uSetDlgItemText(hwnd, IDC_EXCLUDE, cfg_exclude);
@@ -114,32 +115,31 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 						addEditProc, NULL);
 
 					if(w != NULL) {
-						cfg_watched.add_item(*w);
+						tmp_watched.add_item(*w);
 						delete w;
 					}
 					else break;
 				}
 				else if(id == IDC_EDIT && selected != -1) {
 					Watched* w = (Watched*) uDialogBox(IDD_ADDEDIT, hwnd, 
-						addEditProc, LPARAM(&cfg_watched[selected]));
+						addEditProc, LPARAM(&tmp_watched[selected]));
 
 					if(w != NULL) {
-						cfg_watched.replace_item(selected, *w);
+						tmp_watched.replace_item(selected, *w);
 						delete w;
 					}
 					else break;
 				}
 				else if(id == IDC_REMOVE && selected != -1)
-					cfg_watched.remove_by_idx(selected);
+					tmp_watched.remove_by_idx(selected);
 				
 				loadObservedList(listview);
 				EnableWindow(GetDlgItem(hwnd, IDC_EDIT), FALSE);
 				EnableWindow(GetDlgItem(hwnd, IDC_REMOVE), FALSE);
 			}
-			else if(HIWORD(wp) == EN_CHANGE) {
-				if(callback.is_valid())
-					callback->on_state_changed();
-			}
+
+			if(callback.is_valid())
+				callback->on_state_changed();
 			break;
 		}
 

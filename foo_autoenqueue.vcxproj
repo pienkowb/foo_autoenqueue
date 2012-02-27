@@ -81,12 +81,14 @@
     <ClCompile Include="dialogs.cpp" />
     <ClCompile Include="enqueueing.cpp" />
     <ClCompile Include="foo_autoenqueue.cpp" />
+    <ClCompile Include="preferences.cpp" />
     <ClCompile Include="watching.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dialogs.h" />
     <ClInclude Include="enqueueing.h" />
     <ClInclude Include="foo_autoenqueue.h" />
+    <ClInclude Include="preferences.h" />
     <ClInclude Include="resources.h" />
     <ClInclude Include="watching.h" />
   </ItemGroup>

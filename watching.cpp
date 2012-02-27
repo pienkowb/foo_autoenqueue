@@ -1,13 +1,15 @@
 #include "watching.h"
+
 #include "enqueueing.h"
 #include "foo_autoenqueue.h"
+#include "preferences.h"
 
 #include "../SDK/foobar2000.h"
 #include "../helpers/helpers.h"
 
-#include <vector>
 #include <queue>
 #include <string>
+#include <vector>
 
 using namespace std;
 
