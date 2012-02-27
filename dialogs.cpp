@@ -13,7 +13,7 @@
 //------------------------------------------------------------------------------
 
 HFONT createSeparatorFont(HWND hwnd) {
-	HFONT font = (HFONT) SendMessage(hwnd, WM_GETFONT, 0, 0);
+	HFONT font = GetWindowFont(hwnd);
 
 	LOGFONT lf;
 	GetObject(font, sizeof(LOGFONT), &lf);
@@ -31,7 +31,7 @@ void createSeparator(HWND parent, const char* name, int y) {
 		name, WS_CHILD | WS_VISIBLE | WS_TABSTOP, 0, y, 498, 20, parent,
 		NULL, NULL, NULL);
 
-	SendMessage(hwnd, WM_SETFONT, (WPARAM) font, 0);
+	SetWindowFont(hwnd, font, TRUE);
 }
 
 //------------------------------------------------------------------------------
