@@ -116,7 +116,10 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 						addEditProc, NULL);
 
 					if(w != NULL) {
-						tmp_watched.add_item(*w);
+						if(selected != -1)
+							tmp_watched.insert_item(*w, selected);
+						else
+							selected = tmp_watched.add_item(*w);
 						delete w;
 					}
 					else break;
@@ -131,12 +134,18 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 					}
 					else break;
 				}
-				else if(id == IDC_REMOVE && selected != -1)
+				else if(id == IDC_REMOVE && selected != -1) {
 					tmp_watched.remove_by_idx(selected);
-				
+
+					if(selected == tmp_watched.get_count())
+						selected = -1;
+				}
+
 				loadObservedList(listview);
-				EnableWindow(GetDlgItem(hwnd, IDC_EDIT), FALSE);
-				EnableWindow(GetDlgItem(hwnd, IDC_REMOVE), FALSE);
+				listview_helper::select_single_item(listview, selected);
+
+				EnableWindow(GetDlgItem(hwnd, IDC_EDIT), selected != -1);
+				EnableWindow(GetDlgItem(hwnd, IDC_REMOVE), selected != -1);
 			}
 
 			if(callback.is_valid())
