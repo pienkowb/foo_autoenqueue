@@ -26,9 +26,10 @@ HFONT createSeparatorFont(HWND hwnd) {
 void createSeparator(HWND parent, const char* name, int y) {
 	static HFONT font = createSeparatorFont(parent);
 
-	HWND hwnd = uCreateWindowEx(0x00000004, "foobar2000:separator", name,
-		0x50010000, 0, y, 498, 20, parent, NULL, NULL, NULL);
-	
+	HWND hwnd = uCreateWindowEx(WS_EX_NOPARENTNOTIFY, "foobar2000:separator",
+		name, WS_CHILD | WS_VISIBLE | WS_TABSTOP, 0, y, 498, 20, parent,
+		NULL, NULL, NULL);
+
 	SendMessage(hwnd, WM_SETFONT, (WPARAM) font, 0);
 }
 
