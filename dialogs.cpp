@@ -270,7 +270,8 @@ Watched* generateResult(HWND hwnd) {
 	uGetDlgItemText(hwnd, IDC_FOLDER, w->directory);
 	if(uGetFileAttributes(w->directory) == INVALID_FILE_ATTRIBUTES) {
 		pfc::string8 msg = w->directory;
-		msg << (!msg.is_empty() ? "\n" : "") << "Directory doesn't exist.";
+		msg << (!msg.is_empty() ? "\n" : "")
+			<< "Selected directory doesn't exist.";
 
 		errorMessage(hwnd, msg);
 		return NULL;
