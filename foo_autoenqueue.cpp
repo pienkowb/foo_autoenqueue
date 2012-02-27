@@ -39,7 +39,7 @@ public:
 		mutex = CreateMutex(NULL, FALSE, NULL);
 
 		for(unsigned int i = 0; i < watched.size(); i++) {
-			HANDLE h = CreateThread(NULL, 0, WatchingProc, LPVOID(i), 0, NULL);
+			HANDLE h = CreateThread(NULL, 0, WatchingProc, (LPVOID) i, 0, NULL);
 			threads.push_back(h);
 		}
 

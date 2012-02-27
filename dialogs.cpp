@@ -123,7 +123,7 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 				}
 				else if(id == IDC_EDIT && selected != -1) {
 					Watched* w = (Watched*) uDialogBox(IDD_ADDEDIT, hwnd, 
-						addEditProc, LPARAM(&tmp_watched[selected]));
+						addEditProc, (LPARAM) &tmp_watched[selected]);
 
 					if(w != NULL) {
 						tmp_watched.replace_item(selected, *w);
@@ -337,13 +337,13 @@ INT_PTR CALLBACK addEditProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 				else if(id == IDC_OK) {
 					Watched* w = generateResult(hwnd);
 					if(w != NULL)
-						EndDialog(hwnd, INT_PTR(w));
+						EndDialog(hwnd, (INT_PTR) w);
 				}
 				else if(id == IDC_CANCEL)
 					EndDialog(hwnd, NULL);
 			}
 			else if(HIWORD(wp) == CBN_SELCHANGE && LOWORD(wp) == IDC_TYPE) {
-				BOOL state = SendMessage(HWND(lp), CB_GETCURSEL, 0, 0) == 0;
+				BOOL state = SendMessage((HWND) lp, CB_GETCURSEL, 0, 0) == 0;
 				EnableWindow(GetDlgItem(hwnd, IDC_PLAYLIST), state);
 			}
 			break;

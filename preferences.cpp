@@ -49,7 +49,7 @@ PreferencesPage::PreferencesPage(HWND parent,
 	tmp_watched = cfg_watched;
 
 	hwnd = uCreateDialog(IDD_PREFPAGE, parent, prefPageProc,
-		LPARAM(callback.get_ptr()));
+		(LPARAM) callback.get_ptr());
 }
 
 t_uint32 PreferencesPage::get_state() {
