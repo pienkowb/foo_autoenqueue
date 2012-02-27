@@ -8,6 +8,7 @@
 #include "../helpers/helpers.h"
 
 #include <uxtheme.h>
+#include <windowsx.h>
 
 //------------------------------------------------------------------------------
 
@@ -312,21 +313,25 @@ INT_PTR CALLBACK addEditProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 	switch(msg) {
 		case WM_INITDIALOG: {
 			HWND combobox = GetDlgItem(hwnd, IDC_TYPE);
-			uSendMessageText(combobox, CB_ADDSTRING, 0, "custom");
-			uSendMessageText(combobox, CB_ADDSTRING, 0, "active");
-			uSendMessageText(combobox, CB_ADDSTRING, 0, "playing");
+
+			ComboBox_AddString(combobox, L"custom");
+			ComboBox_AddString(combobox, L"active");
+			ComboBox_AddString(combobox, L"playing");
 
 			combobox = GetDlgItem(hwnd, IDC_PLAYLIST);
 			static_api_ptr_t<playlist_manager> pm;
 
 			for(t_size i = 0; i < pm->get_playlist_count(); i++) {
+				if(pm->playlist_lock_is_present(i))
+					continue;
+
 				pfc::string8 playlist;
 				pm->playlist_get_name(i, playlist);
 				uSendMessageText(combobox, CB_ADDSTRING, 0, playlist);
 			}
 
-			if(pm->get_playlist_count())
-				SendDlgItemMessage(hwnd, IDC_PLAYLIST, CB_SETCURSEL, 0, 0);			
+			if(ComboBox_GetCount(combobox))
+				SendDlgItemMessage(hwnd, IDC_PLAYLIST, CB_SETCURSEL, 0, 0);
 
 			SendMessage(hwnd, DM_SETDEFID, IDC_OK, 0);
 
