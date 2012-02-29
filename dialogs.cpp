@@ -164,11 +164,11 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 void initControls(HWND hwnd, Watched* w) {
 	if(w == NULL) {
-		uSetWindowText(hwnd, "Add new observed folder");
-		SendDlgItemMessage(hwnd, IDC_TYPE, CB_SETCURSEL, 0, 0);				
+		uSetWindowText(hwnd, "Add an observed folder");
+		SendDlgItemMessage(hwnd, IDC_TYPE, CB_SETCURSEL, 0, 0);
 	}
 	else {
-		uSetWindowText(hwnd, "Edit observed folder");
+		uSetWindowText(hwnd, "Edit an observed folder");
 		uSetDlgItemText(hwnd, IDC_FOLDER, w->directory);
 
 		CheckDlgButton(hwnd, IDC_OBSERVESUB, w->watchSubtree ? 1 : 0);
@@ -200,7 +200,7 @@ void initControls(HWND hwnd, Watched* w) {
 //------------------------------------------------------------------------------
 
 void openDialog(HWND hwnd) {
-	LPCWSTR title = L"Select folder to observe";
+	LPCWSTR title = L"Select a folder to observe";
 	CoInitialize(NULL);
 
 	OSVERSIONINFO ovi = {0};
