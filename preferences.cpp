@@ -39,38 +39,27 @@ advconfig_integer_factory cfg_buffsize("Buffer size (kB)", cfg_buffsize_guid,
 
 //------------------------------------------------------------------------------
 
-pfc::list_t<Watched> tmp_watched;
-
-//------------------------------------------------------------------------------
-
-PreferencesPage::PreferencesPage(HWND parent,
-	preferences_page_callback::ptr callback)
+PreferencesPage::PreferencesPage(HWND parent, preferences_page_callback::ptr
+	callback) : watched(cfg_watched), callback(callback)
 {
-	tmp_watched = cfg_watched;
-
-	hwnd = uCreateDialog(IDD_PREFPAGE, parent, prefPageProc,
-		(LPARAM) callback.get_ptr());
+	hwnd = uCreateDialog(IDD_PREFPAGE, parent, prefPageProc, (LPARAM) this);
 }
 
 t_uint32 PreferencesPage::get_state() {
 	t_uint32 state = preferences_state::resettable;
 
-	if(tmp_watched != cfg_watched)
-		state |= preferences_state::changed;
-
 	pfc::string8 restrict, exclude;
-
 	uGetWindowText(GetDlgItem(hwnd, IDC_RESTRICT), restrict);
 	uGetWindowText(GetDlgItem(hwnd, IDC_EXCLUDE), exclude);
 
-	if(restrict != cfg_restrict || exclude != cfg_exclude)
+	if(watched != cfg_watched || restrict != cfg_restrict || exclude != cfg_exclude)
 		state |= preferences_state::changed;
 
 	return state;
 }
 
 void PreferencesPage::apply() {
-	(pfc::list_t<Watched>&) cfg_watched = tmp_watched;
+	(pfc::list_t<Watched>&) cfg_watched = watched;
 
 	uGetWindowText(GetDlgItem(hwnd, IDC_RESTRICT), cfg_restrict);
 	uGetWindowText(GetDlgItem(hwnd, IDC_EXCLUDE), cfg_exclude);
@@ -79,7 +68,7 @@ void PreferencesPage::apply() {
 }
 
 void PreferencesPage::reset() {
-	tmp_watched.remove_all();
+	watched.remove_all();
 	ListView_DeleteAllItems(GetDlgItem(hwnd, IDC_OBSERVEDLIST));
 
 	uSetDlgItemText(hwnd, IDC_RESTRICT, "*");

@@ -36,11 +36,11 @@ void createSeparator(HWND parent, const char* name, int y) {
 
 //------------------------------------------------------------------------------
 
-void loadObservedList(HWND listview) {
+void loadObservedList(HWND listview, pfc::list_t<Watched> watched) {
 	ListView_DeleteAllItems(listview);
 
-	for(unsigned int i = 0; i < tmp_watched.get_count(); i++) {
-		const Watched& w = tmp_watched[i];
+	for(unsigned int i = 0; i < watched.get_count(); i++) {
+		const Watched& w = watched[i];
 		listview_helper::insert_item(listview, i, w.directory, NULL);
 
 		if(w.playlist.is_empty()) continue;
@@ -61,11 +61,12 @@ void loadObservedList(HWND listview) {
 //------------------------------------------------------------------------------
 
 INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
-	static preferences_page_callback::ptr callback;
+	PreferencesPage* pp = (PreferencesPage*) GetWindowLong(hwnd, GWL_USERDATA);
 
 	switch(msg) {
 		case WM_INITDIALOG: {
-			callback = (preferences_page_callback*) lp;
+			SetWindowLong(hwnd, GWL_USERDATA, lp);
+			pp = (PreferencesPage*) lp;
 
 			createSeparator(hwnd, "Observed folders", 0);
 			createSeparator(hwnd, "File types", 192);
@@ -80,7 +81,7 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 			listview_helper::insert_column(listview, 0, "Folder", 178);
 			listview_helper::insert_column(listview, 1, "Playlist", 80);
 
-			loadObservedList(listview);
+			loadObservedList(listview, pp->watched);
 
 			uSetDlgItemText(hwnd, IDC_RESTRICT, cfg_restrict);
 			uSetDlgItemText(hwnd, IDC_EXCLUDE, cfg_exclude);
@@ -118,39 +119,39 @@ INT_PTR CALLBACK prefPageProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 					if(w != NULL) {
 						if(selected != -1)
-							tmp_watched.insert_item(*w, selected);
+							pp->watched.insert_item(*w, selected);
 						else
-							selected = tmp_watched.add_item(*w);
+							selected = pp->watched.add_item(*w);
 						delete w;
 					}
 					else break;
 				}
 				else if(id == IDC_EDIT && selected != -1) {
 					Watched* w = (Watched*) uDialogBox(IDD_ADDEDIT, hwnd, 
-						addEditProc, (LPARAM) &tmp_watched[selected]);
+						addEditProc, (LPARAM) &pp->watched[selected]);
 
 					if(w != NULL) {
-						tmp_watched.replace_item(selected, *w);
+						pp->watched.replace_item(selected, *w);
 						delete w;
 					}
 					else break;
 				}
 				else if(id == IDC_REMOVE && selected != -1) {
-					tmp_watched.remove_by_idx(selected);
+					pp->watched.remove_by_idx(selected);
 
-					if(selected == tmp_watched.get_count())
+					if(selected == pp->watched.get_count())
 						selected = -1;
 				}
 
-				loadObservedList(listview);
+				loadObservedList(listview, pp->watched);
 				listview_helper::select_single_item(listview, selected);
 
 				EnableWindow(GetDlgItem(hwnd, IDC_EDIT), selected != -1);
 				EnableWindow(GetDlgItem(hwnd, IDC_REMOVE), selected != -1);
 			}
 
-			if(callback.is_valid())
-				callback->on_state_changed();
+			if(pp && pp->callback.is_valid())
+				pp->callback->on_state_changed();
 			break;
 		}
 

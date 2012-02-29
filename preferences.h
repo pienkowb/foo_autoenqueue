@@ -13,12 +13,12 @@ extern cfg_string cfg_restrict;
 extern cfg_string cfg_exclude;
 extern advconfig_integer_factory cfg_buffsize;
 
-extern pfc::list_t<Watched> tmp_watched;
-
 //------------------------------------------------------------------------------
 
 class PreferencesPage : public preferences_page_instance {
 	HWND hwnd;
+	pfc::list_t<Watched> watched;
+	preferences_page_callback::ptr callback;
 public:
 	PreferencesPage(HWND parent, preferences_page_callback::ptr callback);
 
@@ -26,6 +26,8 @@ public:
 	HWND get_wnd() { return hwnd; }
 	void apply();
 	void reset();
+
+	friend INT_PTR CALLBACK prefPageProc(HWND, UINT, WPARAM, LPARAM);
 };
 
 #endif // PREFERENCES_H
