@@ -253,7 +253,7 @@ void openDialog(HWND hwnd) {
 			if(SHGetPathFromIDList(pidl, buffer))
 				SetDlgItemText(hwnd, IDC_FOLDER, buffer);
 
-			delete buffer;
+			delete[] buffer;
 			CoTaskMemFree(pidl);
 		}
 	}
