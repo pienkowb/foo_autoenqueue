@@ -17,7 +17,7 @@ using namespace stdext;
 
 DECLARE_COMPONENT_VERSION(
 	"Autoenqueuer",
-	"2.0",
+	"2.1",
 	"Copyright (C) 2008-2012 Bartosz Pie\305\204kowski"
 );
 

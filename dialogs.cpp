@@ -12,20 +12,24 @@
 
 //------------------------------------------------------------------------------
 
-HFONT createSeparatorFont(HWND hwnd) {
-	HFONT font = GetWindowFont(hwnd);
+class SeparatorFont {
+	HFONT font;
+public:
+	SeparatorFont(HFONT hf) {
+		LOGFONT lf;
+		GetObject(hf, sizeof(LOGFONT), &lf);
 
-	LOGFONT lf;
-	GetObject(font, sizeof(LOGFONT), &lf);
+		lf.lfHeight = -14;
+		lf.lfWeight = FW_BOLD;
 
-	lf.lfHeight = -14;
-	lf.lfWeight = FW_BOLD;
-
-	return CreateFontIndirect(&lf);
-}
+		font = CreateFontIndirect(&lf);
+	}
+	~SeparatorFont() { DeleteObject(font); }
+	operator HFONT() const { return font; }
+};
 
 void createSeparator(HWND parent, const char* name, int y) {
-	static HFONT font = createSeparatorFont(parent);
+	static auto font = SeparatorFont(GetWindowFont(parent));
 
 	HWND hwnd = uCreateWindowEx(WS_EX_NOPARENTNOTIFY, "foobar2000:separator",
 		name, WS_CHILD | WS_VISIBLE | WS_TABSTOP, 0, y, 498, 20, parent,
@@ -202,7 +206,7 @@ void initControls(HWND hwnd, Watched* w) {
 
 void openDialog(HWND hwnd) {
 	LPCWSTR title = L"Select a folder to observe";
-	CoInitialize(NULL);
+	CoInitializeScope();
 
 	OSVERSIONINFO ovi = {0};
 	ovi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -218,7 +222,7 @@ void openDialog(HWND hwnd) {
 		if(SUCCEEDED(hr)) {
 			DWORD opts;
 			fd->GetOptions(&opts);
-			fd->SetOptions(opts | FOS_PICKFOLDERS);
+			fd->SetOptions(opts | FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM);
 
 			fd->SetTitle(title);
 			hr = fd->Show(hwnd);
@@ -228,12 +232,13 @@ void openDialog(HWND hwnd) {
 				hr = fd->GetResult(&result);
 
 				if(SUCCEEDED(hr)) {
-					LPOLESTR pwsz = NULL;
+					LPWSTR pwsz = NULL;
 					hr = result->GetDisplayName(SIGDN_FILESYSPATH, &pwsz);
 
-					if(SUCCEEDED(hr)) 
+					if(SUCCEEDED(hr)) {
 						SetDlgItemText(hwnd, IDC_FOLDER, pwsz);
-
+						CoTaskMemFree(pwsz);
+					}
 			        result->Release();
 				}
 			}
@@ -247,6 +252,7 @@ void openDialog(HWND hwnd) {
 		bi.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS;
 
 		PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
+
 		if(pidl != NULL) {
 			WCHAR* buffer = new WCHAR[MAX_PATH];
 
