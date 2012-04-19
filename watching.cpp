@@ -52,7 +52,7 @@ DWORD WINAPI WatchingProc(LPVOID lpParameter) {
 	overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	while(watching) {
-        HRESULT result = ReadDirectoryChangesW(directory, buffer, bufferSize,
+		HRESULT result = ReadDirectoryChangesW(directory, buffer, bufferSize,
 			watched[i].watchSubtree, FILE_NOTIFY_CHANGE_FILE_NAME, NULL,
 			&overlapped, NULL);
 
@@ -74,26 +74,27 @@ DWORD WINAPI WatchingProc(LPVOID lpParameter) {
 			break;
 		}
 
-        UINT offset = 0;
-        FILE_NOTIFY_INFORMATION* info;
-        do {
+		UINT offset = 0;
+		FILE_NOTIFY_INFORMATION* info;
+
+		do {
 			info = (FILE_NOTIFY_INFORMATION*) &buffer[offset];
 
 			if(info->Action == FILE_ACTION_ADDED) {
-				wstring f(info->FileName, info->FileNameLength / sizeof(WCHAR));				
+				wstring f(info->FileName, info->FileNameLength / sizeof(WCHAR));
 
-				WaitForSingleObject(mutex, INFINITE);				
-				files.push_back(make_pair(i, f));				
+				WaitForSingleObject(mutex, INFINITE);
+				files.push_back(make_pair(i, f));
 				ReleaseMutex(mutex);
 			}
-            offset += info->NextEntryOffset;
-        } 
+			offset += info->NextEntryOffset;
+		} 
 		while(info->NextEntryOffset);
 	}
 
 	CloseHandle(overlapped.hEvent);
 	delete[] buffer;
-	CloseHandle(directory);	
+	CloseHandle(directory);
 
 	return 0;
 }

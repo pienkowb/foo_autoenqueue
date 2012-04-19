@@ -33,7 +33,7 @@ class initquit_autoenqueue : public initquit {
 public:
 	void on_init() {
 		for(unsigned int i = 0; i < cfg_watched.get_count(); i++)
-			watched.push_back(cfg_watched[i]);		
+			watched.push_back(cfg_watched[i]);
 
 		watching = TRUE;
 		mutex = CreateMutex(NULL, FALSE, NULL);

@@ -239,7 +239,7 @@ void openDialog(HWND hwnd) {
 						SetDlgItemText(hwnd, IDC_FOLDER, pwsz);
 						CoTaskMemFree(pwsz);
 					}
-			        result->Release();
+					result->Release();
 				}
 			}
 			fd->Release();
